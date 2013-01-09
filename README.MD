@@ -1,0 +1,4 @@
+RedditGOD:
+
+RedditGOD is a small project that aims to build upon reddit and it's intentions of being "the homepage of the internet" as it so proudly announces itself as in the <title> tag. This project hopes to make reddit primarily used on the homepage and lets users focus on the content and streamline the upvoting/downprocess process, making it easier to contribute "karma" points to the reddit community. Currently it is compatable with RES v4 and can be used side by side to make for an even better reddit experience!
+Feel free to make changes to this project and fork the project (at the following link: https://github.com/extramaster/redditGOD), code is licensed under the MIT License, eXtraMaster 2013
