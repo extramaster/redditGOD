@@ -6,7 +6,7 @@
 // @license        Licensed under the MIT license - http://opensource.org/licenses/mit-license.php
 // @description    A Reddit enchancer that doesn't go overboard, until you've tried it...
 // @include        htt*://*.reddit.*/*
-// @version        1.0
+// @version        2.0
 // @encoding       UTF-8
 // ==/UserScript==
 /* EXTERNAL SCRIPTS */
@@ -33,8 +33,6 @@ undefined)options.useLocalStorage=true;if(value===null||value===undefined){if(op
 true}if(isStorageAvailable!=false){var value=localStorage.getItem(key);if(value!=undefined&&value!=null)return value}var value="";for(var i=0;i<options.maxNumberOfCookies;i++){if(i==0)var val=$.chunkedcookie(key);else var val=$.chunkedcookie(key+"---"+i);if(val!=null)value+=val;else{if(i==0)return null;break}}return value};
 jQuery.chunkedcookie=function(key,value,options){if(arguments.length>1&&String(value)!=="[object Object]"){options=jQuery.extend({},options);if(value===null||value===undefined)options.expires=-1;if(typeof options.expires==="number"){var days=options.expires,t=options.expires=new Date;t.setDate(t.getDate()+days)}value=String(value);return document.cookie=[encodeURIComponent(key),"=",options.raw?value:encodeURIComponent(value),options.expires?"; expires="+options.expires.toUTCString():"",options.path?
 "; path="+options.path:"",options.domain?"; domain="+options.domain:"",options.secure?"; secure":""].join("")}options=value||{};var result,decode=options.raw?function(s){return s}:decodeURIComponent;return(result=(new RegExp("(?:^|; )"+encodeURIComponent(key)+"=([^;]*)")).exec(document.cookie))?decode(result[1]):null};
-
-
 /**
  * json2.js
  * 2012-10-08
@@ -59,27 +57,25 @@ script.appendChild(document.createTextNode(redditGodInclude.substring(redditGodI
 (document.body || document.head || document.documentElement).appendChild(script);
 /* END EXTERNAL SCRIPTS */
 
-
-
-
-
+// =============
 /* REDDITGOD! */
-/* Oh and if you're reading this, please fork and help contribute to this project. Also, ignore JSLint.. */
-/*jslint browser: true, regexp: true */
-/*global  $,alert */ (function () {
+/* eXtraMaster 2013 */
+/* If you're reading this, please fork and help contribute to this project. Also, ignore JSLint.. */
+/* jslint browser: true, regexp: true */
+/* global  $,alert */
+// =============
+(function () {
     "use strict";
 
-    /* This is the main "init" code and will be appended to the bottom of the page */
     function main() {
         /* INT VAR FIELD */
-        /* eXtraMaster 2013 */
         var PreloadedImage, links, isLinkImage, allowedExt, version, a, linksa, isImage, fileExt, redditGodSpacer, permalink, isBlocked, redditGodBarIcon, redditGod, redditGODCookies, rGCookieName, rGImageActivated;
         /* VAR FIELD */
         PreloadedImage = [];
         isLinkImage = false;
         links = false;
         allowedExt = [".jpg", ".gif", ".png", ".bmp"];
-        version = "1.0";
+        version = "2.0";
         a = 0;
 
         /* save feature is currently handled through localStorage or cookies, depending on the browser.. */
@@ -130,6 +126,9 @@ script.appendChild(document.createTextNode(redditGodInclude.substring(redditGodI
             if (typeof redditGODCookies["autClose"] == "undefined") {
                 redditGODCookies["autClose"] = "true";
             }
+            if (typeof redditGODCookies["autClose2"] == "undefined") {
+                redditGODCookies["autClose2"] = "true";
+            }
             if (typeof redditGODCookies["nsfw"] == "undefined") {
                 redditGODCookies["nsfw"] = "true";
             }
@@ -137,15 +136,23 @@ script.appendChild(document.createTextNode(redditGodInclude.substring(redditGodI
                 redditGODCookies["borders"] = "true";
             }
             if (typeof redditGODCookies["toggle"] == "undefined") {
-                redditGODCookies["toggle"] = "true";
+                redditGODCookies["toggle"] = "false";
             }
             if (typeof redditGODCookies["highlightsize"] == "undefined") {
                 redditGODCookies["highlightsize"] = "true";
             }
+            if (typeof redditGODCookies["injectImages"] == "undefined") {
+                redditGODCookies["injectImages"] = "true";
+            }
+            if (typeof redditGODCookies["videoo"] == "undefined") {
+                redditGODCookies["videoo"] = "true";
+            }
+            if (typeof redditGODCookies["deleted"] == "undefined") {
+                redditGODCookies["deleted"] = "true";
+            }
             rGImageActivated = redditGODCookies["autClose"];
 
             if (redditGODCookies["border"] == "true") {
-                /* Entry block highlighter*/
                 $(".side").css({
                     "border-left": "1px solid #000000",
                     "border-bottom": "1px solid #000000",
@@ -174,24 +181,13 @@ script.appendChild(document.createTextNode(redditGodInclude.substring(redditGodI
                 $(".redditGODToggle").hide();
             }
 
-            /*
-
-$(".thing").css({"position":"relative","z-index":-2});
-$(".thing").each(function(){$(this).children().css({"position":"relative","z-index":1});});
-$(".side").children().css({"position":"relative","z-index":0});
-
-$(".md").css({"position":"relative"});
-*/
-
             if (redditGODCookies["highlightsize"] == "true") {
-                /* Custom: Larger Text */
                 $(".comments").css({
                     "font-size": "1.1em"
                 });
                 $(".hide-button").css({
                     "font-size": "1.05em"
                 });
-                /* End: Larger Text */
             } else {
                 $(".comments").css({
                     "font-size": "1.0em"
@@ -211,13 +207,12 @@ $(".md").css({"position":"relative"});
         rGUpdate("testPost", "please ignore");
         /* Custom: Image displayer */
         function quickMeMeGen(abbb) {
-            abbb = abbb.replace("qkme.me", "i.qkme.me") + "|";
-            abbb = abbb.replace(/www[.]quickmeme[.]com\/meme/ig, "i.qkme.me");
-            return abbb.substring(0, abbb.length - 1) + ".jpg";
+            var p = /(?:qkme\.me|i\.qkme\.me|quickmeme\.com\/meme)(?:.*?)\/([^"&?\/ ]{4,10})/i;
+            return (abbb.match(p)) ? "http://i.qkme.me/"+RegExp.$1+".jpg" : false;
         }
 
         function youtubeVideoGen(url) {
-            var p = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+            var p = /(?:youtube(?:.*?)v\=|youtu\.be\/)([^"&?\/ ]{11})/i;
             return (url.match(p)) ? RegExp.$1 : false;
         }
 
@@ -228,10 +223,10 @@ $(".md").css({"position":"relative"});
                     $(this).find("a").each(function () {
                         isLinkImage = false;
                         links = $(this).attr("href");
+                        linksa = links;
                         if (links.search(/\?/) !== -1) {
                             links = links.split("?")[0];
                         }
-                        linksa = links;
                         isImage = false;
                         fileExt = links.substring((links.length - 4), links.length);
                         for (a = 0; a < allowedExt.length; a += 1) {
@@ -251,9 +246,9 @@ $(".md").css({"position":"relative"});
                             isLinkImage = quickMeMeGen(links);
                         }
 
-                        if (isLinkImage !== false || youtubeVideoGen(links) !== false) {
+                        if (isLinkImage !== false || (youtubeVideoGen(links) !== false && redditGODCookies["videoo"]=="true")) {
                             isBlocked = "display:block";
-                            if (that.parent().find(".nsfw-stamp").length > 0 && redditGODCookies["nsfw"] == "true") {
+                            if ((that.parent().find(".nsfw-stamp").length > 0 && redditGODCookies["nsfw"] == "true") || redditGODCookies["injectImages"] !== "true") {
                                 isBlocked = "display:none";
                             }
                             $(this).before('<span class="flat-list buttons rounded imgd-stamp stamp redditGODToggle" style="font-size: medium; display: inline; border: none; padding-right: 4px; display: inline; white-space: nowrap; border-radius: 7px;' + ((redditGODCookies["toggle"] == "false") ? "display:none;" : "") + '"><acronym title="Toggable content" style="color: #167777; font-size: x-small; text-decoration: none; padding: 0 2px; border: 1px solid #29D8D8!important; border-radius: 3px;">tog</acronym></span>');
@@ -262,8 +257,9 @@ $(".md").css({"position":"relative"});
                             }
                             if (youtubeVideoGen(links) !== false) {
                                 /* Although reddit already has built in youtube support.. It should be removed and replaced with redditGOD!! */
-                                that.get(0).innerHTML += '<p class="injectedRedditGodInteractive"><iframe width="640" height="480" src="https://www.youtube-nocookie.com/embed/' + youtubeVideoGen(links) + '" frameborder="0" allowfullscreen style="' + isBlocked + '"></iframe></p>';
+                                that.get(0).innerHTML += '<p class="injectedRedditGodInteractive"><iframe width="640" height="480" src="//www.youtube-nocookie.com/embed/' + youtubeVideoGen(links) + '" frameborder="0" allowfullscreen style="' + isBlocked + '"></iframe></p>';
                             }
+
                             that.find("a").on("click", function () {
                                 $(this).parent().parent().find(".injectedRedditGodInteractive").eq(0).children().stop().slideToggle();
                                 return false;
@@ -288,13 +284,16 @@ $(".md").css({"position":"relative"});
             }
         });
         /* End: Image displayer */
+if (redditGODCookies["autClose2"] == "true"){
         $(".upmod, .downmod").each(function () {
             $(this).parent().parent().find(".injectedRedditGodInteractive").children().css({
                 "display": "none"
             })
         });
+}
         /* lpt_see_deleted_comments_on_reddit-c7pna50: Comment Delete Viewer */
-        function cc() {
+
+if (redditGODCookies["deleted"] == "true"){
             $(".grayed+.flat-list a:contains('permalink')").each(function (i, e) {
                 var holder = $(e).parents(".entry");
                 e.old = e.hostname;
@@ -305,8 +304,7 @@ $(".md").css({"position":"relative"});
                     e.hostname = e.old;
                 })
             });
-        }
-        cc();
+}
         /* End: Comment Delete Viewer */
 
         /* Start addiction notification */
@@ -325,21 +323,24 @@ $(".md").css({"position":"relative"});
         redditGodSpacer.setAttribute("id", "redditGOD");
         redditGodSpacer.setAttribute("style", "background-color:#D9FFF2;padding:10px;font-size:1.3em;display:none;");
         redditGodSpacer.innerHTML = "<h2 style='text-align:center'>redditGOD v" + version + "</h2><p style='text-align:left'>RedditGOD is a simple reddit enchancer by eXtraMaster. Think of it as a more basic version of RES</p><hr><h2 style='text-align:center'>Settings:</h2>";
-        redditGodSpacer.innerHTML += "<p style='text-align:center'><a href='javascript:$(\".injectedRedditGodInteractive\").children().slideUp();'>Hide inserted images</a> | <a href='javascript:$(\".injectedRedditGodInteractive\").children().slideDown()'>Show inserted images</a></p>";
+        redditGodSpacer.innerHTML += "<p style='text-align:center'><a href='javascript:$(\".injectedRedditGodInteractive\").children().slideUp();'>Hide all additional content</a> | <a href='javascript:$(\".injectedRedditGodInteractive\").children().slideDown()'>Show all additional content</a></p>";
         redditGodSpacer.innerHTML += "<p style='text-align:center'><a href='javascript:$(\".arrow.up\").trigger(\"click\");'>UPTOKE EVERYTHING!</a> | <a href='javascript:$(\".arrow.down\").trigger(\"click\");'>downvote everything</a></p>";
+        redditGodSpacer.innerHTML += "<p>Show additional content onload: <input type='checkbox' " + ((redditGODCookies["injectImages"] == "false") ? "" : "checked") + " onclick='rGUpdate(\"injectImages\",this.checked)'></p>";
+        redditGodSpacer.innerHTML += "<p>Hide voted content onload: <input type='checkbox' " + ((redditGODCookies["autClose2"] == "false") ? "" : "checked") + " onclick='rGUpdate(\"autClose2\",this.checked)'></p>";
+        redditGodSpacer.innerHTML += "<p>Enable additional videos: <input type='checkbox' " + ((redditGODCookies["videoo"] == "false") ? "" : "checked") + " onclick='rGUpdate(\"videoo\",this.checked)'></p>";
         redditGodSpacer.innerHTML += "<p>Automatically close image on vote: <input type='checkbox' " + ((redditGODCookies["autClose"] == "false") ? "" : "checked") + " onclick='rGUpdate(\"autClose\",this.checked)'></p>";
         redditGodSpacer.innerHTML += "<p>Automatically hide NSFW content: <input type='checkbox' " + ((redditGODCookies["nsfw"] == "false") ? "" : "checked") + " onclick='rGUpdate(\"nsfw\",this.checked)'></p>";
         redditGodSpacer.innerHTML += "<p>Add additional borders: <input type='checkbox' " + ((redditGODCookies["border"] == "false") ? "" : "checked") + " onclick='rGUpdate(\"border\",this.checked)'></p>";
         redditGodSpacer.innerHTML += "<p>Show togglable icon: <input type='checkbox' " + ((redditGODCookies["toggle"] == "false") ? "" : "checked") + " onclick='rGUpdate(\"toggle\",this.checked)'></p>";
         redditGodSpacer.innerHTML += "<p>Enable info far font size changer: <input type='checkbox' " + ((redditGODCookies["highlightsize"] == "false") ? "" : "checked") + " onclick='rGUpdate(\"highlightsize\",this.checked)'></p>";
+        redditGodSpacer.innerHTML += "<p>Show deleted comments: <input type='checkbox' " + ((redditGODCookies["deleted"] == "false") ? "" : "checked") + " onclick='rGUpdate(\"deleted\",this.checked)'></p>";
         $(".side").prepend(redditGodSpacer);
         redditGodOverlay = document.createElement('div');
         redditGodOverlay.setAttribute("id", "redditGODOverlay");
         redditGodOverlay.setAttribute("style", "background-color:rgba(0,0,0,0.8);z-index:927;position:fixed;left:0px;top:0px;width:100%;height:100%;margin:0px;border:0px;padding:0px;");
         redditGodOverlay.innerHTML = "";
 
-        /* Image overlay, to implement...
-        $("body").append(redditGodOverlay);
+        /* Image overlay, to implement later... $("body").append(redditGodOverlay);
         redditGodOverlay2 = document.createElement('div');
         redditGodOverlay2.setAttribute("id", "redditGODOverlayImg");
         redditGodOverlay2.setAttribute("style", "z-index:928;");
@@ -350,8 +351,7 @@ $(".md").css({"position":"relative"});
             $("#redditGODOverlayImg").fadeOut();
         });
             $("#redditGODOverlay").hide();
-            $("#redditGODOverlayImg").hide();
-*/
+            $("#redditGODOverlayImg").hide();*/
 
 
         /* One more update..... */
